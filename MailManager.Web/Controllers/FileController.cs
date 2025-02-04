@@ -22,23 +22,65 @@ namespace MailManager.Web.Controllers
             return View();
         }
 
+        //[HttpPost]
+        //public ActionResult UploadExcel()
+        //{
+        //    try
+        //    {
+        //        var uploadFile = Request.Files["file"];
+        //        if (uploadFile != null && uploadFile.ContentLength > 0)
+        //        {
+        //            var fileExtension = Path.GetExtension(uploadFile.FileName);
+        //            if (fileExtension != ".xlsx" && fileExtension != ".xls")
+        //            {
+        //                TempData["UploadMessage"] = "Only Excel files (.xlsx, .xls) are allowed.";
+        //                TempData["UploadStatus"] = "error";
+        //                return RedirectToAction("Index");
+        //            }
+
+        //            ExcelHelper.UploadExcelFile(uploadFile.InputStream);
+        //            TempData["UploadMessage"] = "File uploaded successfully.";
+        //            TempData["UploadStatus"] = "success";
+        //        }
+        //        else
+        //        {
+        //            TempData["UploadMessage"] = "No file selected.";
+        //            TempData["UploadStatus"] = "error";
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        TempData["UploadMessage"] = "Error: " + ex.Message;
+        //        TempData["UploadStatus"] = "error";
+        //    }
+        //    return View();
+        //}
+
         [HttpPost]
         public ActionResult UploadExcel()
         {
             try
             {
-                var uploadFile = Request.Files["importexcelfile"];
+                var uploadFile = Request.Files["file"];
                 if (uploadFile != null && uploadFile.ContentLength > 0)
                 {
+                    var fileExtension = Path.GetExtension(uploadFile.FileName);
+                    if (fileExtension != ".xlsx" && fileExtension != ".xls")
+                    {
+                        return Json(new { success = false, message = "Only Excel files (.xlsx, .xls) are allowed." });
+                    }
                     ExcelHelper.UploadExcelFile(uploadFile.InputStream);
+                    return Json(new { success = true, message = "File uploaded successfully." });
+                }
+                else
+                {
+                    return Json(new { success = false, message = "No file selected." });
                 }
             }
             catch (Exception ex)
             {
-
-                ModelState.AddModelError("", ex.Message);
+                return Json(new { success = false, message = "Error: " + ex.Message });
             }
-            return RedirectToAction("Index");
         }
 
 

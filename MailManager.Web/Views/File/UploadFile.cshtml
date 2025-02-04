@@ -169,42 +169,113 @@
         </div>
     }
 
-    <script>
-        const fileInput = document.getElementById('file-input');
-        const selectedFileName = document.getElementById('selected-file-name');
-        const uploadArea = document.querySelector('.upload-area');
+    @if (TempData["UploadMessage"] != null)
+    {
+        <div class="alert @(TempData["UploadStatus"] == "success" ? "alert-success" : "alert-danger")">
+            @TempData["UploadMessage"]
+        </div>
+    }
 
-        fileInput.addEventListener('change', (e) => {
-            if (e.target.files.length > 0) {
-                selectedFileName.style.display = 'block';
-                selectedFileName.textContent = `Selected file: ${e.target.files[0].name}`;
-            }
-        });
 
-        // Drag and drop functionality
-        uploadArea.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            uploadArea.style.borderColor = '#0051FF';
-            uploadArea.style.background = 'rgba(0, 122, 255, 0.05)';
-        });
-
-        uploadArea.addEventListener('dragleave', (e) => {
-            e.preventDefault();
-            uploadArea.style.borderColor = '#007AFF';
-            uploadArea.style.background = 'transparent';
-        });
-
-        uploadArea.addEventListener('drop', (e) => {
-            e.preventDefault();
-            uploadArea.style.borderColor = '#007AFF';
-            uploadArea.style.background = 'transparent';
-
-            if (e.dataTransfer.files.length > 0) {
-                fileInput.files = e.dataTransfer.files;
-                selectedFileName.style.display = 'block';
-                selectedFileName.textContent = `Selected file: ${e.dataTransfer.files[0].name}`;
-            }
-        });
-    </script>
+   
 </body>
 </html>
+
+<script>
+    const form = document.getElementById('upload-form');
+    const fileInput = document.getElementById('file-input');
+    const selectedFileName = document.getElementById('selected-file-name');
+    const uploadArea = document.querySelector('.upload-area');
+
+    form.addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        if (!fileInput.files.length) {
+            showMessage('Please select a file first.', false);
+            return;
+        }
+
+        const formData = new FormData(form);
+
+        fetch(form.action, {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => response.json())
+            .then(data => {
+                showMessage(data.message, data.success);
+                if (data.success) {
+                    fileInput.value = '';
+                    selectedFileName.style.display = 'none';
+                }
+            })
+            .catch(error => {
+                showMessage('An error occurred during upload.', false);
+            });
+    });
+
+    function showMessage(message, isSuccess) {
+        // Remove existing alert if any
+        const existingAlert = document.querySelector('.alert');
+        if (existingAlert) {
+            existingAlert.remove();
+        }
+
+        // Create new alert
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `alert ${isSuccess ? 'alert-success' : 'alert-danger'}`;
+        alertDiv.textContent = message;
+
+        // Add styles to the alert
+        alertDiv.style.position = 'fixed';
+        alertDiv.style.top = '20px';
+        alertDiv.style.left = '50%';
+        alertDiv.style.transform = 'translateX(-50%)';
+        alertDiv.style.padding = '15px 30px';
+        alertDiv.style.borderRadius = '8px';
+        alertDiv.style.zIndex = '1000';
+        alertDiv.style.backgroundColor = isSuccess ? '#d4edda' : '#f8d7da';
+        alertDiv.style.color = isSuccess ? '#155724' : '#721c24';
+        alertDiv.style.border = `1px solid ${isSuccess ? '#c3e6cb' : '#f5c6cb'}`;
+
+        // Add to document
+        document.body.appendChild(alertDiv);
+
+        // Remove after 5 seconds
+        setTimeout(() => {
+            alertDiv.remove();
+        }, 5000);
+    }
+
+    // Rest of your existing drag and drop code remains the same
+    fileInput.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) {
+            selectedFileName.style.display = 'block';
+            selectedFileName.textContent = `Selected file: ${e.target.files[0].name}`;
+        }
+    });
+
+    uploadArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadArea.style.borderColor = '#0051FF';
+        uploadArea.style.background = 'rgba(0, 122, 255, 0.05)';
+    });
+
+    uploadArea.addEventListener('dragleave', (e) => {
+        e.preventDefault();
+        uploadArea.style.borderColor = '#007AFF';
+        uploadArea.style.background = 'transparent';
+    });
+
+    uploadArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadArea.style.borderColor = '#007AFF';
+        uploadArea.style.background = 'transparent';
+
+        if (e.dataTransfer.files.length > 0) {
+            fileInput.files = e.dataTransfer.files;
+            selectedFileName.style.display = 'block';
+            selectedFileName.textContent = `Selected file: ${e.dataTransfer.files[0].name}`;
+        }
+    });
+</script>
