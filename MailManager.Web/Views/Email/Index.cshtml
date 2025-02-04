@@ -27,7 +27,7 @@
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.RecipientName)
-                </td> 
+                </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.EmailTo)
                 </td>
@@ -38,13 +38,30 @@
 </table>
 
 <form method="post" action="@Url.Action("SendEmails")">
-    <button type="submit" class="btn btn-primary">Send Email</button>
+    <button onclick="sendEmails()" type="button" class="btn btn-primary">Send Email</button>
 </form>
 
-@if (TempData["Message"] != null)
-{
-    <div class="alert alert-info">
-        @TempData["Message"]
-    </div>
-}
 
+
+<script>
+    function sendEmails() {
+        $.ajax({
+            url: '/Email/SendEmails',
+            type: 'POST',
+            dataType: 'json',  
+            success: function (response) {
+                if (response && response.message) {
+                    alert(response.success ? response.message : "Error: " + response.message);
+                } else {
+                    alert("Error: Invalid response from server.");
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error("AJAX Error:", xhr.responseText);
+                alert("Error: " + (xhr.responseJSON?.message || "Something went wrong while sending emails."));
+            }
+        });
+    }
+
+
+</script>
