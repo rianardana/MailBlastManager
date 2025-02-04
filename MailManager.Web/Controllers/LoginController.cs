@@ -20,10 +20,11 @@ namespace MailManager.Web.Controllers
         }
         public ActionResult Index(string returnUrl)
         {
+            var model = new LoginVM();
             ViewBag.ReturnUrl = returnUrl;
             FormsAuthentication.SignOut();
             Session.Clear();
-            return View();
+            return View(model);
         }
 
         [HttpPost]

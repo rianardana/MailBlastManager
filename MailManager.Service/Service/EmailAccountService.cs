@@ -17,9 +17,24 @@ namespace MailManager.Service.Service
         {
             _uow = unit;
         }
+
+        public void Update(EmailAccount obj)
+        {
+            if (obj == null) throw new ArgumentNullException(nameof(obj));
+            _uow.Repository<EmailAccount>().Attach(obj);
+            _uow.SaveChanges();
+
+            
+        }
+
         public List<EmailAccount> GetAll()
         {
             return _uow.Repository<EmailAccount>().Table().ToList();
+        }
+
+        public EmailAccount GetById(int id)
+        {
+            return _uow.Repository<EmailAccount>().GetById(id);
         }
 
         public EmailAccount GetDefaultEmailAccount()

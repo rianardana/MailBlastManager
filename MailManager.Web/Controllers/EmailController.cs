@@ -29,12 +29,27 @@ namespace MailManager.Web.Controllers
             var model = new List<MasterMailVM>();
             try
             {
-                model = _service.GetAll().Select(item=>item.ToModel()).ToList();    
+                model = _service.GetReadyReceipent().Select(item=>item.ToModel()).ToList();    
             }
             catch (Exception ex)
             {
 
                 ModelState.AddModelError("",ex.Message);
+            }
+            return View(model);
+        }
+
+        public ActionResult Report()
+        {
+            var model = new List<MasterMailVM>();
+            try
+            {
+                model = _service.GetSentEmails().Select(item => item.ToModel()).ToList();
+            }
+            catch (Exception ex)
+            {
+
+                ModelState.AddModelError("", ex.Message);
             }
             return View(model);
         }
@@ -60,7 +75,7 @@ namespace MailManager.Web.Controllers
         {
             try
             {
-                var emails = _service.GetUnsentEmails();
+                var emails = _service.GetReadyReceipent();
                 if (!emails.Any())
                 {
                     return Json(new { success = false, message = "No pending emails found." }, JsonRequestBehavior.AllowGet);
@@ -78,6 +93,7 @@ namespace MailManager.Web.Controllers
                 {
                     try
                     {
+                        _service.UpdateSubject(email);
                         using (var message = new MailMessage())
                         using (var smtpClient = new SmtpClient())
                         {
@@ -122,7 +138,7 @@ namespace MailManager.Web.Controllers
                                     Console.WriteLine($"WARNING: File NOT FOUND at: {pdfPath}");
                                 }
                             }
-
+                            
                             smtpClient.Send(message);
 
                             email.IsSent = true;

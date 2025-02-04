@@ -11,5 +11,8 @@ namespace MailManager.Service.IService
     {
         List<EmailAccount> GetAll();
         EmailAccount GetDefaultEmailAccount();
+
+        void Update(EmailAccount obj);
+        EmailAccount GetById(int id);
     }
 }

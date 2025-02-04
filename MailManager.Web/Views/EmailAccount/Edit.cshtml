@@ -1,0 +1,110 @@
+﻿@model MailManager.Web.ViewModel.EmailAccountVM
+
+@{
+    ViewData["Title"] = "Edit";
+
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+
+<h5 style="margin-bottom:25px;">Edit Mail Configuration</h5>
+
+
+
+@using (Html.BeginForm("Edit", "EmailAccount", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+<div class="form-horizontal">
+    <hr />
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+    <div class="row">
+
+        <div class="col-md-4">
+            <div class="form-group">
+
+                @Html.LabelFor(model => model.DisplayName, htmlAttributes: new { @class = "control-label" })
+                @Html.EditorFor(model => model.DisplayName, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.DisplayName, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="form-group">
+
+                @Html.LabelFor(model => model.Email, htmlAttributes: new { @class = "control-label" })
+                @Html.EditorFor(model => model.Email, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+
+                @Html.LabelFor(model => model.Host, htmlAttributes: new { @class = "control-label" })
+                @Html.EditorFor(model => model.Host, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Host, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+    </div>
+    <div class="row">
+
+        <div class="col-md-4">
+            <div class="form-group">
+
+                @Html.LabelFor(model => model.Username, htmlAttributes: new { @class = "control-label" })
+                @Html.EditorFor(model => model.Username, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Username, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <div class="form-group">
+
+                @Html.LabelFor(model => model.Password, htmlAttributes: new { @class = "control-label" })
+                @Html.EditorFor(model => model.Password, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="col-md-1">
+            <div class="form-group">
+
+                @Html.LabelFor(model => model.Port, htmlAttributes: new { @class = "control-label" })
+                @Html.EditorFor(model => model.Port, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Port, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="col-md-1">
+            <div class="form-group">
+
+                @Html.LabelFor(model => model.EnableSsl, htmlAttributes: new { @class = "control-label" })
+                @Html.CheckBoxFor(model => model.EnableSsl, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.EnableSsl, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="col-md-1">
+            <div class="form-group">
+
+                @Html.LabelFor(model => model.UseDefaultCredentials, htmlAttributes: new { @class = "control-label" })
+                @Html.CheckBoxFor(model => model.UseDefaultCredentials, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.UseDefaultCredentials, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+    </div>
+
+
+    <div class="form-group">
+        @Html.ActionLink("Back to Home", "Index", "Home", null, new { @class = "btn btn-danger" })
+        <input type="submit" value="Save" class="btn btn-dark" />
+    </div>
+
+
+
+
+</div>
+    @section Scripts {
+        @Scripts.Render("~/bundles/jqueryval")
+    }
+}

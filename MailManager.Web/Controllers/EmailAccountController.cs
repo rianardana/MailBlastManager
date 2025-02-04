@@ -31,5 +31,47 @@ namespace MailManager.Web.Controllers
             }
             return View(model);
         }
+
+        public ActionResult Edit(int Id)
+        {
+            var model = new EmailAccountVM();
+            try
+            {
+                if(Id==0)
+                {
+                    return new HttpStatusCodeResult(System.Net.HttpStatusCode.BadRequest);
+                }
+                var entity = _service.GetById(Id);
+                
+                if(entity == null)
+                {
+                    return HttpNotFound();
+                }
+                model = entity.ToModel();   
+            }
+            catch (Exception ex)
+            {
+
+                ModelState.AddModelError("", ex.Message);
+            }
+            return View(model);
+        }
+
+        [HttpPost]
+        public ActionResult Edit(EmailAccountVM model)
+        {
+            try
+            {
+                var entity = model.ToEntity();
+                _service.Update(entity);
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+
+                ModelState.AddModelError("", ex.Message);
+            }
+            return View(model);
+        }
     }
 }

@@ -9,13 +9,18 @@ namespace MailManager.Service.IService
 {
     public interface IMasterMailService
     {
-        List<MasterMail> GetUnsentEmails();
+        List<MasterMail> GetSentEmails();
+        List<MasterMail> GetReadyReceipent();
 
         void UpdateEmailStatus(MasterMail mail);
 
         //void SendEmails();
 
+        void Insert(MasterMail obj);
+        void Update(MasterMail obj);
+
         List<MasterMail> GetAll();
-        void SendQueuedEmails();
+        //void SendQueuedEmails();
+        void UpdateSubject(MasterMail mail);
     }
 }

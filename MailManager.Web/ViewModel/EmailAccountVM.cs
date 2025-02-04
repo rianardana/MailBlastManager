@@ -19,9 +19,9 @@ namespace MailManager.Web.ViewModel
         [Display(Name = "User Name")]
         public string Username { get; set; }
         public int Port { get; set; }
-        [Display(Name = "Enable SSL")]
+        [Display(Name = "SSL")]
         public bool EnableSsl { get; set; }
-        [Display(Name = "Use Default Credential")]
+        [Display(Name = " Credential")]
         public bool UseDefaultCredentials { get; set; }
     }
 }
