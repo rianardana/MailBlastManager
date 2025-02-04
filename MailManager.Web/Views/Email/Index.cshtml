@@ -1,0 +1,50 @@
+﻿@model IEnumerable<MailManager.Web.ViewModel.MasterMailVM>
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<table table id="tblMail" class="table table-striped table-sm table-border">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.FileName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.RecipientName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.EmailTo)
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.FileName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.RecipientName)
+                </td> 
+                <td>
+                    @Html.DisplayFor(modelItem => item.EmailTo)
+                </td>
+
+            </tr>
+        }
+    </tbody>
+</table>
+
+<form method="post" action="@Url.Action("SendEmails")">
+    <button type="submit" class="btn btn-primary">Send Email</button>
+</form>
+
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-info">
+        @TempData["Message"]
+    </div>
+}
+

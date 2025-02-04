@@ -1,0 +1,369 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Home</title>
+    <link rel="icon" type="image/x-icon" href="~/AdminLTE/dist/img/Dind.ico">
+
+    <!-- Google Font: Source Sans Pro -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="~/AdminLTE/plugins/fontawesome-free/css/all.min.css">
+    <!-- overlayScrollbars -->
+    <link rel="stylesheet" href="~/AdminLTE/plugins/overlayScrollbars/css/OverlayScrollbars.min.css">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="~/AdminLTE/dist/css/adminlte.min.css">
+    @*<link href="~/AdminLTE/plugins/daterangepicker/daterangepicker.css" rel="stylesheet" />*@
+    <link href="~/AdminLTE/plugins/jquery-ui/jquery-ui.min.css" rel="stylesheet" />
+    <!-- DataTables -->
+    <link rel="stylesheet" href="~/AdminLTE/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="~/AdminLTE/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
+    <link rel="stylesheet" href="~/AdminLTE/plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
+
+    <script src="~/AdminLTE/plugins/jquery/jquery.js"></script>
+    <script src="~/AdminLTE/plugins/jquery-ui/jquery-ui.min.js"></script>
+    @*<script src="~/AdminLTE/plugins/jquery-ui/jquery-ui.js"></script>*@
+
+    @*<script src="~/js/site.js" asp-append-version="true"></script>*@
+    <!-- Bootstrap 4 -->
+    <script src="~/AdminLTE/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <!-- overlayScrollbars -->
+    <script src="~/AdminLTE/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js"></script>
+    <!-- AdminLTE App -->
+    <script src="~/AdminLTE/dist/js/adminlte.min.js"></script>
+
+    <!-- BS Stepper -->
+    <script src="~/AdminLTE/plugins/bs-stepper/js/bs-stepper.min.js"></script>
+
+    @*CSS for Dynamic Field*@
+    <link href="~/Content/Site.css" rel="stylesheet" asp-append-version="true" />
+
+    <!-- referensi untuk jQuery dan jQuery UI -->
+    <!--<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://code.jquery.com/ui/1.13.1/themes/base/jquery-ui.css" rel="stylesheet" />
+    <script src="https://code.jquery.com/ui/1.13.1/jquery-ui.min.js"></script>-->
+    @*Select2*@
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+
+</head>
+
+
+@*@{ CustomPrincipalSerializeModel cookie = SessionManager.GetCookiData();
+    var strName = "";
+    var strRole = "";
+    if (cookie != null)
+    {
+        strName = cookie.UserName;
+        strRole = cookie.Role;
+    }
+
+}*@
+
+<body class=" sidebar-dark-indigo">
+    <!-- Site wrapper -->
+    <div class="wrapper">
+        <!-- Navbar -->
+        <nav class="main-header navbar navbar-expand navbar-gray-dark">
+            <!-- Left navbar links -->
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" data-widget="pushmenu" href="#" role="button" style="color:whitesmoke"><i class="fas fa-mail-bulk" style="color:deepskyblue"> </i>  </a>
+                </li>
+
+            </ul>
+
+
+            <!-- Right navbar links -->
+            <ul class="navbar-nav ml-auto">
+
+                <!-- Notifications Dropdown Menu -->
+                <li class="nav-item">
+                    <i class="nav-link" href="#">
+                        Welcome @*@strName (@strRole)*@
+                    </i>
+                </li>
+
+                <li class="nav-item dropdown">
+                    <a class="nav-link" data-toggle="dropdown" href="#">
+                        <i style="color:white" class="far fa-user"></i>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-md dropdown-menu-right">
+                        <a href="/Login/ChangePassword" class="dropdown-item dropdown-header" style="color:black">Change Password</a>
+                        <a href="/Mail/" class="dropdown-item dropdown-header" style="color:black">Mail Configuration</a>
+                        @*<div class="dropdown-divider"></div>*@
+                        <a href="/Login/LogOut" class="dropdown-item dropdown-footer">Log Out</a>
+                    </div>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link" data-toggle="dropdown" href="#">
+                        <i style="color:yellow" class="far fa-question-circle"></i>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-md dropdown-menu-right">
+                        <a href="/Home/Contact" class="dropdown-item dropdown-header" style="color:black">Contact IT</a>
+                    </div>
+                </li>
+
+
+            </ul>
+        </nav>
+        <!-- /.navbar -->
+        <!--  End Right navbar links -->
+        <!-- /.navbar -->
+        <!-- Main Sidebar Container -->
+        <aside class="main-sidebar sidebar-dark-green">
+            <!-- Brand Logo -->
+            <a href="/Home" class="brand-link">
+
+                <img src="~/AdminLTE/dist/img/Login.png" alt="Logo" class="brand-image">
+                <span class="brand-text font-weight-light" style="color: white !important"> Mail Manager </span>
+            </a>
+
+            <!-- Sidebar -->
+            <div class="sidebar">
+
+
+                <nav class="mt-2">
+
+                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+
+
+
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="nav-icon fas fa-cog"></i>
+                                <p>
+                                    Sender Mail
+                                    <i class="fas fa-angle-down right"></i>
+
+                                </p>
+                            </a>
+                            <ul class="nav nav-treeview">
+
+                                <li class="nav-item">
+                                    <a href="/EmailAccount/Index" class="nav-link">
+
+                                        <p>Setting Mail</p>
+
+                                    </a>
+                                </li>
+
+                            </ul>
+
+
+
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="nav-icon fas fa-users"></i>
+                                <p>
+                                    Receipent Mail List
+                                    <i class="fas fa-angle-down right"></i>
+
+                                </p>
+                            </a>
+                            <ul class="nav nav-treeview">
+
+                                <li class="nav-item">
+                                    <a href="/Email/Index" class="nav-link">
+
+                                        <p>List Receipent</p>
+
+                                    </a>
+                                </li>
+
+                            </ul>
+
+
+
+                        </li>
+
+
+
+
+                    </ul>
+                </nav>
+
+
+                <!-- /.sidebar-menu -->
+
+
+            </div>
+            <!-- /.sidebar -->
+        </aside>
+
+        <!-- Content Wrapper. Contains page content -->
+        <div class="content-wrapper">
+
+            <section class="content">
+
+                @*<div class="container-fluid">*@
+
+
+                @RenderBody()
+                <div id="myLoading"></div>
+
+                @RenderSection("scripts", required: false)
+                @*</div>*@
+            </section>
+
+        </div>
+
+        <!-- /.content-wrapper -->
+        <!-- Content Header (Page header) -->
+        <!-- Main content -->
+        <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+    @*<footer class="main-footer">
+            <div class="float-right d-none d-sm-block">
+                <b>Version</b> 1.0.0
+            </div>
+            <strong>Copyright &copy; 2023 - <a href="/Home/Contact">IT Dynacast Indonesia.</a></strong>
+        </footer>*@
+
+    <!-- Control Sidebar -->
+    <aside class="control-sidebar control-sidebar-light">
+        <!-- Control sidebar content goes here -->
+    </aside>
+    <!-- /.control-sidebar -->
+    <!-- ./wrapper -->
+    <!-- jQuery -->
+    <!-- DataTables  & Plugins -->
+
+    <script src="~/AdminLTE/plugins/datatables/jquery.dataTables.min.js"></script>
+    <script src="~/AdminLTE/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+    <script src="~/AdminLTE/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="~/AdminLTE/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+    <script src="~/AdminLTE/plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
+    <script src="~/AdminLTE/plugins/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
+    <script src="~/AdminLTE/plugins/jszip/jszip.min.js"></script>
+    <script src="~/AdminLTE/plugins/pdfmake/pdfmake.min.js"></script>
+    <script src="~/AdminLTE/plugins/pdfmake/vfs_fonts.js"></script>
+    <script src="~/AdminLTE/plugins/datatables-buttons/js/buttons.html5.min.js"></script>
+    <script src="~/AdminLTE/plugins/datatables-buttons/js/buttons.print.min.js"></script>
+    <script src="~/AdminLTE/plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <style>
+        /* Start by setting display:none to make this hidden.
+        Then we position it in relation to the viewport window
+        with position:fixed. Width, height, top and left speak
+        for themselves. Background we set to 80% white with
+        our animation centered, and no-repeating */
+        .modal-loading {
+            display: block;
+            position: fixed;
+            z-index: 1000;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 100%;
+            background: rgba( 255, 255, 255, .8 ) url("/Content/images/ajax-loader.gif") 50% 50% no-repeat;
+        }
+
+        /* When the body has the loading class, we turn
+        the scrollbar off with overflow:hidden */
+        body.loading {
+            overflow: hidden;
+        }
+
+            /* Anytime the body has the loading class, our
+        modal element will be visible */
+            body.loading .modal-loading {
+                display: block;
+            }
+    </style>
+
+</body>
+
+</html>
+
+<script src="~/Scripts/ShowMenuScript.js"></script>
+<!-- page script -->
+<script>
+    $(document).ready(function () {
+
+        //Report()
+    });
+    function showLoading() {
+        //  var loading = $(".modal-loading");
+        //  loading.css({ display: "block" });
+        var $body = $("#myLoading");
+        $body.addClass("modal-loading");
+    }
+
+    function hideLoading() {
+        var $body = $("#myLoading");
+        $body.removeClass("modal-loading");
+        //var $body = $("body");
+        // $body.removeClass("loading");
+    }
+
+    //$(function () {
+    //    $("#example1").DataTable({
+    //        "responsive": true, "lengthChange": false, "autoWidth": false,
+    //        /*"buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]*/
+    //    }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+    //    $('#example2').DataTable({
+    //        "paging": true,
+    //        "lengthChange": false,
+    //        "searching": false,
+    //        "ordering": false,
+    //        "info": true,
+    //        "autoWidth": false,
+    //        "responsive": true,
+    //    });
+    //});
+
+    $(function () {
+        $("#example1").DataTable({
+            "responsive": true, "lengthChange": false, "autoWidth": false,
+            "buttons": [
+                {
+                    extend: "copy",
+                    className: "btn btn-warning", // Ubah tampilan tombol "excel" menjadi hijau
+                    text: '<i class="fas fa-copy"></i> Copy' // Ubah teks tombol
+                },
+                {
+                    extend: "excel",
+                    className: "btn btn-success", // Ubah tampilan tombol "excel" menjadi hijau
+                    text: '<i class="fas fa-file-excel"></i> Export to Excel' // Ubah teks tombol
+                },
+
+                {
+                    extend: "print",
+                    className: "btn btn-info", // Ubah tampilan tombol "print" menjadi biru
+                    text: '<i class="fas fa-print"></i> Print' // Ubah teks tombol
+                }
+            ],
+            "ordering": false
+        }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+
+        $("#csvOnly").DataTable({
+            "responsive": true,
+            "lengthChange": false,
+            "autoWidth": false,
+            "ordering": true,
+            "paging": false
+            //"buttons": [
+
+            //    {
+            //        extend: "csv",
+            //        className: "btn btn-success", // Ubah tampilan tombol "excel" menjadi hijau
+            //        text: '<i class="fas fa-file-csv"></i> Download CSV' // Ubah teks tombol
+            //    },
+
+
+            //],
+
+        }).buttons().container().appendTo('#csvOnly_wrapper .col-md-6:eq(0)');
+
+    });
+
+
+
+
+
+</script>
