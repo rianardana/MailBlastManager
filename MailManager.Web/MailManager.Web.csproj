@@ -71,6 +71,9 @@
     <Reference Include="EPPlus.System.Drawing, Version=6.1.1.0, Culture=neutral, PublicKeyToken=2308d35469c9bac0, processorArchitecture=MSIL">
       <HintPath>..\packages\EPPlus.System.Drawing.6.1.1\lib\net462\EPPlus.System.Drawing.dll</HintPath>
     </Reference>
+    <Reference Include="itextsharp, Version=5.5.13.0, Culture=neutral, PublicKeyToken=8354ae6d2174ddca, processorArchitecture=MSIL">
+      <HintPath>..\packages\iTextSharp.5.5.13\lib\itextsharp.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Bcl.AsyncInterfaces.1.1.0\lib\net461\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
     </Reference>
@@ -2711,6 +2714,8 @@
     <Content Include="Views\File\UploadFile.cshtml" />
     <Content Include="Views\EmailAccount\Edit.cshtml" />
     <Content Include="Views\Email\Report.cshtml" />
+    <Content Include="Views\Email\ReadyDoc.cshtml" />
+    <Content Include="Views\Email\AllReadyDoc.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="AdminLTE\dist\css\.vs\css\v16\" />

@@ -17,7 +17,9 @@ namespace MailManager.Web.ViewModel
         public string EmailTo { get; set; }      
         public string Subject { get; set; }      
         public string Body { get; set; }          
-        public bool IsSent { get; set; }        
+        public bool IsSent { get; set; }
+        public bool IsEncrypted { get; set; }
         public DateTime? SentOnUTC { get; set; }
+        public DateTime DateofBirth { get; set; }
     }
 }

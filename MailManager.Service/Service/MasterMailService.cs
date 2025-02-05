@@ -14,6 +14,7 @@ using System.Web;
 //using MimeKit;
 using System.Net.Mail;
 using System.IO;
+using iTextSharp.text.pdf;
 
 namespace MailManager.Service.Service
 {
@@ -28,6 +29,23 @@ namespace MailManager.Service.Service
         public MasterMailService(IUnitOfWork unit)
         {
             _uow = unit;
+        }
+
+        public static class PasswordGenerator
+        {
+            public static string GeneratePassword(string employeeId, DateTime? dateOfBirth)
+            {
+                if (string.IsNullOrEmpty(employeeId) || !dateOfBirth.HasValue)
+                {
+                    return "default_password";
+                }
+
+                // Format tanggal lahir menjadi ddMMyyyy
+                string formattedDate = dateOfBirth.Value.ToString("ddMMyyyy");
+
+                // Gabungkan ID dengan tanggal lahir
+                return $"{employeeId}@{formattedDate}";
+            }
         }
         public List<MasterMail> GetSentEmails()
         {
@@ -115,6 +133,10 @@ namespace MailManager.Service.Service
             return _uow.Repository<MasterMail>().Table().ToList();
         }
 
+        public List<MasterMail> GetReady()
+        {
+            return _uow.Repository<MasterMail>().Table().Where(c=>c.IsEncrypted==false).ToList();
+        }
 
 
         //public void SendQueuedEmails()
@@ -149,10 +171,10 @@ namespace MailManager.Service.Service
         //                message.Body = HttpUtility.HtmlDecode(email.Body);
         //                message.IsBodyHtml = true;
 
-                        
+
         //                string baseDir = AppDomain.CurrentDomain.BaseDirectory;
-                       
-                      
+
+
         //                DirectoryInfo dir = new DirectoryInfo(baseDir);
         //                while (dir != null && dir.Name != "MailManager.Web")
         //                {
@@ -175,7 +197,7 @@ namespace MailManager.Service.Service
         //                    if (File.Exists(pdfPath))
         //                    {
         //                        message.Attachments.Add(new Attachment(pdfPath));
-                                
+
         //                    }
         //                    else
         //                    {
@@ -185,12 +207,12 @@ namespace MailManager.Service.Service
 
         //                smtpClient.Send(message);
 
-                       
+
         //                email.IsSent = true;
         //                email.SentOnUTC = DateTime.UtcNow;
         //                UpdateEmailStatus(email);
 
-                       
+
         //            }
         //            catch (Exception ex)
         //            {
@@ -198,7 +220,7 @@ namespace MailManager.Service.Service
         //                {
         //                    Console.WriteLine($"Inner Exception: {ex.InnerException.Message}");
         //                }
-                        
+
         //            }
         //        }
         //    }
@@ -209,28 +231,49 @@ namespace MailManager.Service.Service
         //    }
         //}
 
-       
+
+        //public List<MasterMail> GetReadyReceipent()
+        //{
+        //    string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+        //    DirectoryInfo dir = new DirectoryInfo(baseDir);
+
+        //   while (dir != null && dir.Name != "MailManager.Web")
+        //    {
+        //        dir = dir.Parent;
+        //    }
+
+        //    if (dir == null)
+        //    {
+        //        Console.WriteLine("ERROR: Tidak menemukan folder MailManager.Web!");
+        //        return new List<MasterMail>();
+        //    }
+
+        //    string pdfFolderPath = Path.Combine(dir.FullName, "FilePDF");
+
+        //    var allEmails = _uow.Repository<MasterMail>().Table().ToList();
+
+        //        var readyEmails = allEmails.Where(email =>
+        //        !string.IsNullOrEmpty(email.FileName) &&
+        //        File.Exists(Path.Combine(pdfFolderPath, email.FileName + ".pdf"))
+        //    ).ToList();
+
+        //    return readyEmails;
+        //}
+
         public List<MasterMail> GetReadyReceipent()
         {
-            string baseDir = AppDomain.CurrentDomain.BaseDirectory;
-            DirectoryInfo dir = new DirectoryInfo(baseDir);
+            
+            string webRootPath = System.Web.Hosting.HostingEnvironment.MapPath("~/");
+            string pdfFolderPath = Path.Combine(webRootPath, "FilePDF");
 
-           while (dir != null && dir.Name != "MailManager.Web")
+            if (!Directory.Exists(pdfFolderPath))
             {
-                dir = dir.Parent;
-            }
-
-            if (dir == null)
-            {
-                Console.WriteLine("ERROR: Tidak menemukan folder MailManager.Web!");
+                Console.WriteLine($"ERROR: Folder tidak ditemukan di path: {pdfFolderPath}");
                 return new List<MasterMail>();
             }
 
-            string pdfFolderPath = Path.Combine(dir.FullName, "FilePDF");
-
             var allEmails = _uow.Repository<MasterMail>().Table().ToList();
-
-                var readyEmails = allEmails.Where(email =>
+            var readyEmails = allEmails.Where(email =>
                 !string.IsNullOrEmpty(email.FileName) &&
                 File.Exists(Path.Combine(pdfFolderPath, email.FileName + ".pdf"))
             ).ToList();
@@ -250,6 +293,149 @@ namespace MailManager.Service.Service
             _uow.Repository<MasterMail>().Attach(obj);
             _uow.SaveChanges();
         }
+
+        public bool EncryptPdf(int id)
+        {
+            try
+            {
+                // Ambil data email dari database
+                var email = _uow.Repository<MasterMail>().GetById(id);
+                if (email == null) return false;
+
+                // Dapatkan path file
+                string webRootPath = System.Web.Hosting.HostingEnvironment.MapPath("~/");
+                string pdfFolderPath = Path.Combine(webRootPath, "FilePDF");
+
+                string sourceFile = Path.Combine(pdfFolderPath, email.FileName + ".pdf");
+                string encryptedFile = Path.Combine(pdfFolderPath, email.FileName +"-" + email.RecipientName + ".pdf");
+
+                // Cek apakah file exists
+                if (!File.Exists(sourceFile))
+                {
+                    System.Diagnostics.Trace.WriteLine($"File tidak ditemukan: {sourceFile}");
+                    return false;
+                }
+
+                // Generate password (contoh: menggunakan EmployeeNumber atau field lain)
+                string password = PasswordGenerator.GeneratePassword(
+                    email.FileName,  // Pastikan nama field sesuai dengan model Anda
+                    email.DateofBirth  // Pastikan nama field sesuai dengan model Anda
+                );
+
+                using (Stream input = new FileStream(sourceFile, FileMode.Open, FileAccess.Read, FileShare.Read))
+                using (Stream output = new FileStream(encryptedFile, FileMode.Create, FileAccess.Write, FileShare.None))
+                {
+                    PdfReader reader = new PdfReader(input);
+                    PdfEncryptor.Encrypt(reader, output,
+                        true,
+                        password,
+                        password,
+                        PdfWriter.ALLOW_PRINTING | PdfWriter.ALLOW_COPY
+                    );
+                }
+
+                // Update nama file di database
+                //email.FileName = email.FileName;
+                email.IsEncrypted = true;
+                email.Body = password; // Simpan password jika diperlukan
+                UpdatePdfStatus(email);
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Trace.WriteLine($"Error encrypting PDF: {ex.Message}");
+                return false;
+            }
+        }
+
+        public void UpdatePdfStatus(MasterMail email)
+        {
+            if (email == null) throw new ArgumentNullException("email");
+            _uow.Repository<MasterMail>().Attach(email);
+            _uow.SaveChanges();
+        }
+
+
+        public (int success, int failed, List<string> errors) EncryptAllPdfs()
+        {
+            var successCount = 0;
+            var failedCount = 0;
+            var errors = new List<string>();
+
+            try
+            {
+                // Mulai transaction untuk memastikan data consistency
+                _uow.CreateTransaction();
+
+                // Ambil semua data yang belum dienkripsi
+                var unencryptedEmails = _uow.Repository<MasterMail>().Table()
+                    .Where(c => c.IsEncrypted == false)
+                    .ToList();
+
+                foreach (var email in unencryptedEmails)
+                {
+                    try
+                    {
+                        string webRootPath = System.Web.Hosting.HostingEnvironment.MapPath("~/");
+                        string pdfFolderPath = Path.Combine(webRootPath, "FilePDF");
+                        string sourceFile = Path.Combine(pdfFolderPath, email.FileName + ".pdf");
+                        string encryptedFile = Path.Combine(pdfFolderPath, email.FileName + "-" + email.RecipientName + ".pdf");
+
+                        if (!File.Exists(sourceFile))
+                        {
+                            errors.Add($"File tidak ditemukan: {email.FileName}.pdf");
+                            failedCount++;
+                            continue;
+                        }
+
+                        string password = PasswordGenerator.GeneratePassword(email.FileName,email.DateofBirth);
+
+                        using (Stream input = new FileStream(sourceFile, FileMode.Open, FileAccess.Read, FileShare.Read))
+                        using (Stream output = new FileStream(encryptedFile, FileMode.Create, FileAccess.Write, FileShare.None))
+                        {
+                            PdfReader reader = new PdfReader(input);
+                            PdfEncryptor.Encrypt(reader, output,
+                                true,
+                                password,
+                                password,
+                                PdfWriter.ALLOW_PRINTING | PdfWriter.ALLOW_COPY
+                            );
+                        }
+
+                        //email.FileName = email.FileName + "-" + email.RecipientName;
+                        email.IsEncrypted = true;
+                        email.Body= password;
+                        _uow.Repository<MasterMail>().Attach(email);
+
+                        successCount++;
+                    }
+                    catch (Exception ex)
+                    {
+                        errors.Add($"Error encrypting {email.FileName}: {ex.Message}");
+                        failedCount++;
+                    }
+                }
+
+                // Simpan semua perubahan
+                _uow.SaveChanges();
+                _uow.Commit();
+
+                return (successCount, failedCount, errors);
+            }
+            catch (Exception ex)
+            {
+                _uow.Rollback();
+                errors.Add($"Transaction error: {ex.Message}");
+                return (successCount, failedCount, errors);
+            }
+        }
     }
 
+
 }
+
+
+
+
+

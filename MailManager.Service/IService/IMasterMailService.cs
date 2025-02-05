@@ -21,6 +21,10 @@ namespace MailManager.Service.IService
 
         List<MasterMail> GetAll();
         //void SendQueuedEmails();
+        List<MasterMail> GetReady();
         void UpdateSubject(MasterMail mail);
+        void UpdatePdfStatus(MasterMail email);
+        bool EncryptPdf(int id);
+        (int success, int failed, List<string> errors) EncryptAllPdfs();
     }
 }

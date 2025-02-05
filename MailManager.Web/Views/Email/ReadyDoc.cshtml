@@ -1,0 +1,116 @@
+﻿@model IEnumerable<MailManager.Web.ViewModel.MasterMailVM>
+
+@{
+    ViewBag.Title = "PDF Encryption";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-4">
+    <h2>PDF Encryption Management</h2>
+
+    <div class="card">
+        <div class="card-body">
+            <table id="emailTable" class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>File Name</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.FileName</td>
+                           
+                            <td>
+                                @if (item.IsEncrypted)
+                                {
+                                    <span class="badge bg-success">Encrypted</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-warning">Not Encrypted</span>
+                                }
+                            </td>
+                            <td>
+                                @if (!item.IsEncrypted)
+                                {
+                                    <button class="btn btn-primary btn-sm encrypt-btn"
+                                            data-id="@item.Id" data-filename="@item.FileName">
+                                        Encrypt PDF
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-secondary btn-sm" disabled>
+                                        Already Encrypted
+                                    </button>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Inisialisasi DataTable
+            $('#emailTable').DataTable({
+                "order": [[2, "asc"]], // Urutkan berdasarkan status
+                "pageLength": 10
+            });
+
+            // Handler untuk tombol encrypt
+            $('.encrypt-btn').click(function () {
+                var btn = $(this);
+                var Id = btn.data('id');
+                var filename = btn.data('filename');
+
+                if (confirm('Are you sure you want to encrypt PDF: ' + filename + '?')) {
+                    btn.prop('disabled', true)
+                       .html('<span class="spinner-border spinner-border-sm"></span> Processing...');
+
+                    $.ajax({
+                        url: '/Email/Encrypt',
+                        type: 'POST',
+                        data: { Id: Id },
+                        success: function (response) {
+                            if (response.success) {
+                                // Update UI
+                                var row = btn.closest('tr');
+                                row.find('td:eq(2)').html('<span class="badge bg-success">Encrypted</span>');
+                                btn.removeClass('btn-primary')
+                                   .addClass('btn-secondary')
+                                   .html('Already Encrypted')
+                                   .prop('disabled', true);
+
+                                // Show success message
+                                toastr.success(response.message);
+                            } else {
+                                // Reset button state
+                                btn.prop('disabled', false)
+                                   .html('Encrypt PDF');
+
+                                // Show error message
+                                toastr.error('Error: ' + response.message);
+                            }
+                        },
+                        error: function (xhr, status, error) {
+                            // Reset button state
+                            btn.prop('disabled', false)
+                               .html('Encrypt PDF');
+
+                            // Show error message
+                            toastr.error('Server error occurred. Please try again.');
+                        }
+                    });
+                }
+            });
+        });</script>
+}

@@ -1,8 +1,10 @@
-﻿using MailManager.Data;
+﻿using iTextSharp.text.pdf;
+using MailManager.Data;
 using MailManager.Service.IService;
 using MailManager.Service.UnitOfWork;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -41,5 +43,7 @@ namespace MailManager.Service.Service
         {
             return _uow.Repository<EmailAccount>().Table().FirstOrDefault();
         }
+
+        
     }
 }

@@ -31,12 +31,30 @@ namespace MailManager.Web.Helpers
                     if (string.IsNullOrEmpty(Convert.ToString(obj[k, 1]))) continue;
 
 
-
                     var mail = new MasterMail();
 
                     mail.FileName= Convert.ToString(obj[k, 0]);
                     mail.RecipientName = Convert.ToString(obj[k, 1]);
                     mail.EmailTo = Convert.ToString(obj[k, 2]);
+                    string dateString = Convert.ToString(obj[k, 3]);
+                    DateTime result;
+
+                    // Mencoba beberapa metode parsing
+                    if (DateTime.TryParseExact(dateString.Trim(), "dd/MM/yyyy",
+                        System.Globalization.CultureInfo.InvariantCulture,
+                        System.Globalization.DateTimeStyles.None,
+                        out result))
+                    {
+                        mail.DateofBirth = result;
+                    }
+                    else if (double.TryParse(dateString, out double excelDate))
+                    {
+                        mail.DateofBirth = DateTime.FromOADate(excelDate);
+                    }
+                    else
+                    {
+                        throw new Exception($"Tidak bisa mengkonversi tanggal: {dateString} untuk {mail.RecipientName}");
+                    }
 
                     datas.Add(mail);
 

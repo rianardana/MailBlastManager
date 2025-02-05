@@ -14,5 +14,6 @@ namespace MailManager.Service.IService
 
         void Update(EmailAccount obj);
         EmailAccount GetById(int id);
+        
     }
 }

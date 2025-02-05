@@ -22,5 +22,7 @@ namespace MailManager.Data
         public string Body { get; set; }
         public Nullable<bool> IsSent { get; set; }
         public Nullable<System.DateTime> SentOnUTC { get; set; }
+        public bool IsEncrypted { get; set; }
+        public System.DateTime DateofBirth { get; set; }
     }
 }

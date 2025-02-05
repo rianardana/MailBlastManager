@@ -1,0 +1,126 @@
+﻿@model IEnumerable<MailManager.Web.ViewModel.MasterMailVM>
+
+
+<link href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
+<link href="//cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css" rel="stylesheet">
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+<script src="//cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+
+<div class="container mt-4">
+    <div class="row mb-3">
+        <div class="col">
+            <h2>PDF Encryption Management</h2>
+        </div>
+        <div class="col text-end">
+            <button id="encryptAllBtn" class="btn btn-primary">
+                Encrypt All PDFs
+            </button>
+        </div>
+    </div>
+
+    <div id="encryptionProgress" class="progress mb-3" style="display: none;">
+        <div class="progress-bar progress-bar-striped progress-bar-animated"
+             role="progressbar" style="width: 100%">
+            Processing...
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <table id="emailTable" class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>File Name</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.FileName</td>
+                            <td>
+                                @if (item.IsEncrypted)
+                                {
+                                    <span class="badge bg-success">Encrypted</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-warning">Not Encrypted</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Initialize DataTable with correct column index
+            var table = $('#emailTable').DataTable({
+                "order": [[1, "asc"]], // Changed from 2 to 1 since we only have 2 columns
+                "pageLength": 10
+            });
+
+            // Di bagian $(document).ready
+            toastr.options = {
+                "closeButton": true,
+                "progressBar": true,
+                "timeOut": "3000"
+            };
+
+            $('#encryptAllBtn').click(function () {
+                if (!confirm('Are you sure you want to encrypt all unencrypted PDFs?')) {
+                    return;
+                }
+
+                var btn = $(this);
+                btn.prop('disabled', true)
+                    .html('<span class="spinner-border spinner-border-sm"></span> Processing...');
+                $('#encryptionProgress').show();
+
+                $.ajax({
+                    url: '/Email/EncryptAll',
+                    type: 'POST',
+                    success: function (response) {
+                        try {
+                            if (response.success) {
+                                toastr.success(`Successfully encrypted ${response.successCount} files.`);
+
+                                if (response.failedCount > 0) {
+                                    toastr.warning(`Failed to encrypt ${response.failedCount} files.`);
+                                    console.log('Encryption errors:', response.errors);
+                                }
+
+                                // Set timeout before reload to ensure toastr messages are shown
+                                setTimeout(function () {
+                                    window.location.reload();
+                                }, 1500);
+                            } else {
+                                toastr.error('Error: ' + response.message);
+                                btn.prop('disabled', false).html('Encrypt All PDFs');
+                                $('#encryptionProgress').hide();
+                            }
+                        } catch (e) {
+                            console.error('Error processing response:', e);
+                            toastr.error('Error processing response');
+                            btn.prop('disabled', false).html('Encrypt All PDFs');
+                            $('#encryptionProgress').hide();
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Ajax error:', error);
+                        toastr.error('Server error occurred. Please try again.');
+                        btn.prop('disabled', false).html('Encrypt All PDFs');
+                        $('#encryptionProgress').hide();
+                    }
+                });
+            });
+        });
+    </script>
+}

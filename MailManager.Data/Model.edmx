@@ -24,13 +24,15 @@
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="FileName" Type="nvarchar" MaxLength="225" />
-          <Property Name="RecipientName" Type="nvarchar" MaxLength="225" />
-          <Property Name="EmailTo" Type="nvarchar" MaxLength="225" />
+          <Property Name="FileName" Type="nvarchar" MaxLength="225" Nullable="false" />
+          <Property Name="RecipientName" Type="nvarchar" MaxLength="225" Nullable="false" />
+          <Property Name="EmailTo" Type="nvarchar" MaxLength="225" Nullable="false" />
           <Property Name="Subject" Type="nvarchar" MaxLength="50" />
           <Property Name="Body" Type="nvarchar(max)" />
           <Property Name="IsSent" Type="bit" />
           <Property Name="SentOnUTC" Type="datetime" />
+          <Property Name="IsEncrypted" Type="bit" Nullable="false" />
+          <Property Name="DateofBirth" Type="date" Nullable="false" />
         </EntityType>
         <EntityType Name="User">
           <Key>
@@ -81,13 +83,15 @@
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="FileName" Type="String" MaxLength="225" FixedLength="false" Unicode="true" />
-          <Property Name="RecipientName" Type="String" MaxLength="225" FixedLength="false" Unicode="true" />
-          <Property Name="EmailTo" Type="String" MaxLength="225" FixedLength="false" Unicode="true" />
+          <Property Name="FileName" Type="String" Nullable="false" MaxLength="225" FixedLength="false" Unicode="true" />
+          <Property Name="RecipientName" Type="String" Nullable="false" MaxLength="225" FixedLength="false" Unicode="true" />
+          <Property Name="EmailTo" Type="String" Nullable="false" MaxLength="225" FixedLength="false" Unicode="true" />
           <Property Name="Subject" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="Body" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="IsSent" Type="Boolean" />
           <Property Name="SentOnUTC" Type="DateTime" Precision="3" />
+          <Property Name="IsEncrypted" Type="Boolean" Nullable="false" />
+          <Property Name="DateofBirth" Type="DateTime" Nullable="false" Precision="0" />
         </EntityType>
       </Schema>
     </edmx:ConceptualModels>
@@ -122,6 +126,8 @@
           <EntitySetMapping Name="MasterMails">
             <EntityTypeMapping TypeName="MailManagerModel.MasterMail">
               <MappingFragment StoreEntitySet="MasterMail">
+                <ScalarProperty Name="DateofBirth" ColumnName="DateofBirth" />
+                <ScalarProperty Name="IsEncrypted" ColumnName="IsEncrypted" />
                 <ScalarProperty Name="SentOnUTC" ColumnName="SentOnUTC" />
                 <ScalarProperty Name="IsSent" ColumnName="IsSent" />
                 <ScalarProperty Name="Body" ColumnName="Body" />
