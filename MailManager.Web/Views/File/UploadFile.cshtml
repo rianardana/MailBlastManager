@@ -129,6 +129,10 @@
             align-items: center;
         }
 
+        #uploadStatus {
+            margin-top: 20px;
+            text-align: center;
+        }
         .download-template {
             margin-top: 10px;
             display: inline-flex;
@@ -166,6 +170,9 @@
                 <button type="submit" class="btn btn-primary">Upload</button>
                 <a href="@Url.Action("Index", "Home")" class="btn btn-danger">Back to Home</a>
             </div>
+            <div>
+                <div id="uploadStatus"></div>
+            </div>
         </div>
     }
 
@@ -176,8 +183,8 @@
         </div>
     }
 
+    
 
-   
 </body>
 </html>
 
@@ -189,6 +196,8 @@
 
     form.addEventListener('submit', function (e) {
         e.preventDefault();
+
+        $("#uploadStatus").html("<p>Uploading...</p>");
 
         if (!fileInput.files.length) {
             showMessage('Please select a file first.', false);
@@ -208,6 +217,7 @@
                     fileInput.value = '';
                     selectedFileName.style.display = 'none';
                 }
+                $("#uploadStatus").html("");
             })
             .catch(error => {
                 showMessage('An error occurred during upload.', false);

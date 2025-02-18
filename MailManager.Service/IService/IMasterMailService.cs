@@ -26,5 +26,6 @@ namespace MailManager.Service.IService
         void UpdatePdfStatus(MasterMail email);
         bool EncryptPdf(int id);
         (int success, int failed, List<string> errors) EncryptAllPdfs();
+        List<MasterMail> GetReadyAndEncryptedReceipent();
     }
 }

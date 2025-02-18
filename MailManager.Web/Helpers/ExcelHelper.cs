@@ -33,7 +33,7 @@ namespace MailManager.Web.Helpers
 
                     var mail = new MasterMail();
 
-                    mail.FileName= Convert.ToString(obj[k, 0]);
+                    mail.NoBadge= Convert.ToString(obj[k, 0]);
                     mail.RecipientName = Convert.ToString(obj[k, 1]);
                     mail.EmailTo = Convert.ToString(obj[k, 2]);
                     string dateString = Convert.ToString(obj[k, 3]);
@@ -53,7 +53,7 @@ namespace MailManager.Web.Helpers
                     }
                     else
                     {
-                        throw new Exception($"Tidak bisa mengkonversi tanggal: {dateString} untuk {mail.RecipientName}");
+                        throw new Exception($"Convert Date Error : {dateString} for {mail.RecipientName}");
                     }
 
                     datas.Add(mail);

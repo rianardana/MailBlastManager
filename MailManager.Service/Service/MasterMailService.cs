@@ -31,6 +31,89 @@ namespace MailManager.Service.Service
             _uow = unit;
         }
 
+        public static class EmailTemplates
+        {
+            public static string GetPdfEmailTemplate()
+            {
+                return @"
+            <html>
+            <head>
+                <style>
+                    body {
+                        font-family: Arial, sans-serif;
+                        line-height: 1.6;
+                        color: #333;
+                        max-width: 600px;
+                        margin: 0 auto;
+                        padding: 20px;
+                    }
+                    .header {
+                        background-color: #f8f9fa;
+                        padding: 15px;
+                        border-radius: 5px;
+                        margin-bottom: 20px;
+                    }
+                    .warning {
+                        color: #dc3545;
+                        font-weight: bold;
+                        margin: 15px 0;
+                    }
+                    .section {
+                        margin: 20px 0;
+                        padding: 15px;
+                        border-left: 4px solid #007bff;
+                        background-color: #f8f9fa;
+                    }
+                    .example {
+                        background-color: #e9ecef;
+                        padding: 10px;
+                        border-radius: 5px;
+                        margin: 10px 0;
+                    }
+                    .divider {
+                        border-top: 1px solid #dee2e6;
+                        margin: 20px 0;
+                    }
+                </style>
+            </head>
+            <body>
+                <div class='header'>
+                    <h2>Bukti Pemotongan PPh Pasal 21</h2>
+                </div>
+
+                <!-- English Section -->
+                <div class='section'>
+                    <p>This Email is sent automatically from the Mail Blast system of PT. DYNACAST INDONESIA.</p>
+                    <p class='warning'>DO NOT REPLY TO THIS EMAIL.</p>
+                    <p>Your PDF password is ID@Date of Birth:</p>
+                    
+                    <div class='example'>
+                        <strong>Example:</strong><br>
+                        ID: AN190001<br>
+                        Date of Birth: May 25, 1990<br>
+                        Password: AN190001@25051990
+                    </div>
+                </div>
+
+                <div class='divider'></div>
+
+                <!-- Indonesian Section -->
+                <div class='section'>
+                    <p>Email ini dikirim secara otomatis dari sistem Mail Blast PT. DYNACAST INDONESIA.</p>
+                    <p class='warning'>JANGAN MEMBALAS EMAIL INI.</p>
+                    <p>Kata sandi PDF anda adalah ID@tanggal lahir:</p>
+                    
+                    <div class='example'>
+                        <strong>Contoh:</strong><br>
+                        ID: AN190001<br>
+                        Tanggal lahir: 25 Mei 1990<br>
+                        Sandi: AN190001@25051990
+                    </div>
+                </div>
+            </body>
+            </html>";
+            }
+        }
         public static class PasswordGenerator
         {
             public static string GeneratePassword(string employeeId, DateTime? dateOfBirth)
@@ -79,11 +162,8 @@ namespace MailManager.Service.Service
 
             if (existingEmail != null)
             {
-                existingEmail.Subject = "PDF from PT Dynacast";
-                existingEmail.Body = @"This Email is sent automatically from the Mail Blast system of PT. DYNACAST INDONESIA 
-                                and no signature is required, DO NOT REPLY TO THIS EMAIL. 
-                                Email ini dikirim secara otomatis dari sistem Mail Blast PT. DYNACAST INDONESIA dan tidak memerlukan tanda tangan, 
-                                JANGAN MEMBALAS EMAIL INI.";
+                existingEmail.Subject = "Bukti Pemotongan PPh Pasal 21";
+                existingEmail.Body = EmailTemplates.GetPdfEmailTemplate();
 
                 _uow.Repository<MasterMail>().Attach(existingEmail); 
                 _uow.SaveChanges();
@@ -274,8 +354,29 @@ namespace MailManager.Service.Service
 
             var allEmails = _uow.Repository<MasterMail>().Table().ToList();
             var readyEmails = allEmails.Where(email =>
-                !string.IsNullOrEmpty(email.FileName) &&
-                File.Exists(Path.Combine(pdfFolderPath, email.FileName + ".pdf"))
+                !string.IsNullOrEmpty(email.NoBadge) &&
+                File.Exists(Path.Combine(pdfFolderPath, email.NoBadge + ".pdf"))
+            ).ToList();
+
+            return readyEmails;
+        }
+
+        public List<MasterMail> GetReadyAndEncryptedReceipent()
+        {
+
+            string webRootPath = System.Web.Hosting.HostingEnvironment.MapPath("~/");
+            string pdfFolderPath = Path.Combine(webRootPath, "FilePDF");
+
+            if (!Directory.Exists(pdfFolderPath))
+            {
+                Console.WriteLine($"ERROR: Folder tidak ditemukan di path: {pdfFolderPath}");
+                return new List<MasterMail>();
+            }
+
+            var allEmails = _uow.Repository<MasterMail>().Table().Where(c=>c.IsEncrypted==true && c.IsSent==false).ToList();
+            var readyEmails = allEmails.Where(email =>
+                !string.IsNullOrEmpty(email.NoBadge) &&
+                File.Exists(Path.Combine(pdfFolderPath, email.NoBadge +"-" + email.RecipientName+ ".pdf"))
             ).ToList();
 
             return readyEmails;
@@ -362,14 +463,11 @@ namespace MailManager.Service.Service
             var successCount = 0;
             var failedCount = 0;
             var errors = new List<string>();
-
             try
             {
-                // Mulai transaction untuk memastikan data consistency
                 _uow.CreateTransaction();
-
-                // Ambil semua data yang belum dienkripsi
-                var unencryptedEmails = _uow.Repository<MasterMail>().Table()
+                var unencryptedEmails = _uow.Repository<MasterMail>()
+                    .Table()
                     .Where(c => c.IsEncrypted == false)
                     .ToList();
 
@@ -379,8 +477,8 @@ namespace MailManager.Service.Service
                     {
                         string webRootPath = System.Web.Hosting.HostingEnvironment.MapPath("~/");
                         string pdfFolderPath = Path.Combine(webRootPath, "FilePDF");
-                        string sourceFile = Path.Combine(pdfFolderPath, email.FileName + ".pdf");
-                        string encryptedFile = Path.Combine(pdfFolderPath, email.FileName + "-" + email.RecipientName + ".pdf");
+                        string sourceFile = Path.Combine(pdfFolderPath, email.NoBadge + ".pdf");
+                        string encryptedFile = Path.Combine(pdfFolderPath, email.NoBadge + "-" + email.RecipientName + ".pdf");
 
                         if (!File.Exists(sourceFile))
                         {
@@ -389,26 +487,58 @@ namespace MailManager.Service.Service
                             continue;
                         }
 
-                        string password = PasswordGenerator.GeneratePassword(email.FileName,email.DateofBirth);
+                        string password = PasswordGenerator.GeneratePassword(email.NoBadge, email.DateofBirth);
+                        bool encryptionSuccess = false;
 
-                        using (Stream input = new FileStream(sourceFile, FileMode.Open, FileAccess.Read, FileShare.Read))
-                        using (Stream output = new FileStream(encryptedFile, FileMode.Create, FileAccess.Write, FileShare.None))
+                        try
                         {
-                            PdfReader reader = new PdfReader(input);
-                            PdfEncryptor.Encrypt(reader, output,
-                                true,
-                                password,
-                                password,
-                                PdfWriter.ALLOW_PRINTING | PdfWriter.ALLOW_COPY
-                            );
+                            using (Stream input = new FileStream(sourceFile, FileMode.Open, FileAccess.Read, FileShare.Read))
+                            using (Stream output = new FileStream(encryptedFile, FileMode.Create, FileAccess.Write, FileShare.None))
+                            {
+                                PdfReader reader = new PdfReader(input);
+                                PdfEncryptor.Encrypt(reader, output,
+                                    true,
+                                    password,
+                                    password,
+                                    PdfWriter.ALLOW_PRINTING | PdfWriter.ALLOW_COPY
+                                );
+                                encryptionSuccess = true;
+                            }
+
+                            // Jika enkripsi berhasil, update database dan hapus file lama
+                            if (encryptionSuccess)
+                            {
+                                // Hapus file lama
+                                try
+                                {
+                                    File.Delete(sourceFile);
+                                }
+                                catch (Exception deleteEx)
+                                {
+                                    // Log error penghapusan tapi jangan hentikan proses
+                                    errors.Add($"Warning: Gagal menghapus file lama {email.NoBadge}.pdf: {deleteEx.Message}");
+                                }
+
+                                email.FileName = email.NoBadge + "-" + email.RecipientName;
+                                email.IsEncrypted = true;
+                                email.Body = password;
+                                _uow.Repository<MasterMail>().Attach(email);
+                                successCount++;
+                            }
                         }
-
-                        //email.FileName = email.FileName + "-" + email.RecipientName;
-                        email.IsEncrypted = true;
-                        email.Body= password;
-                        _uow.Repository<MasterMail>().Attach(email);
-
-                        successCount++;
+                        catch (Exception ex)
+                        {
+                            // Jika terjadi error saat enkripsi, hapus file hasil enkripsi jika sudah terbuat
+                            if (File.Exists(encryptedFile))
+                            {
+                                try
+                                {
+                                    File.Delete(encryptedFile);
+                                }
+                                catch { /* Ignore cleanup errors */ }
+                            }
+                            throw; // Re-throw untuk ditangkap oleh catch di luar
+                        }
                     }
                     catch (Exception ex)
                     {
@@ -420,7 +550,6 @@ namespace MailManager.Service.Service
                 // Simpan semua perubahan
                 _uow.SaveChanges();
                 _uow.Commit();
-
                 return (successCount, failedCount, errors);
             }
             catch (Exception ex)

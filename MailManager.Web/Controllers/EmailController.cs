@@ -29,7 +29,7 @@ namespace MailManager.Web.Controllers
             var model = new List<MasterMailVM>();
             try
             {
-                model = _service.GetReadyReceipent().Select(item=>item.ToModel()).ToList();    
+                model = _service.GetReadyAndEncryptedReceipent().Select(item=>item.ToModel()).ToList();    
             }
             catch (Exception ex)
             {
@@ -171,7 +171,7 @@ namespace MailManager.Web.Controllers
         {
             try
             {
-                var emails = _service.GetReadyReceipent();
+                var emails = _service.GetReadyAndEncryptedReceipent();
                 if (!emails.Any())
                 {
                     return Json(new { success = false, message = "No pending emails found." }, JsonRequestBehavior.AllowGet);
@@ -203,7 +203,7 @@ namespace MailManager.Web.Controllers
                             smtpClient.UseDefaultCredentials = false;
                             smtpClient.Credentials = new NetworkCredential(emailAccount.Username, emailAccount.Password);
 
-                            message.From = new MailAddress(emailAccount.Email, "NoReply");
+                            message.From = new MailAddress(emailAccount.Email, "[No Reply] DIND Blast Mail");
                             message.To.Add(email.EmailTo);
                             message.Subject = email.Subject;
                             message.Body = HttpUtility.HtmlDecode(email.Body);
@@ -314,22 +314,24 @@ namespace MailManager.Web.Controllers
         {
             try
             {
-                var result = _service.EncryptAllPdfs();
-
-                var message = $"Successfully encrypted {result.success} files. ";
-                if (result.failed > 0)
+                var emails = _service.GetReady();
+                if (!emails.Any())
                 {
-                    message += $"Failed to encrypt {result.failed} files. ";
-                    message += $"Errors: {string.Join("; ", result.errors)}";
+                    return Json(new { success = false, message = "No pending emails found." }, JsonRequestBehavior.AllowGet);
                 }
+
+                var result = _service.EncryptAllPdfs();
+                bool isOverallSuccess = result.failed == 0;
 
                 return Json(new
                 {
-                    success = true,
+                    success = isOverallSuccess,
                     successCount = result.success,
                     failedCount = result.failed,
                     errors = result.errors,
-                    message = message
+                    message = isOverallSuccess
+                        ? $"Successfully encrypted {result.success} files."
+                        : $"Failed to encrypt {result.failed} files. Errors: {string.Join("; ", result.errors)}"
                 }, JsonRequestBehavior.AllowGet);
             }
             catch (Exception ex)

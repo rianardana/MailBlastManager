@@ -5,98 +5,137 @@
 
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<table table id="searchTable" class="table table-striped table-sm table-border">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.FileName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.RecipientName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.EmailTo)
-            </th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.FileName)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.RecipientName)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.EmailTo)
-                </td>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 
-            </tr>
-        }
-    </tbody>
-</table>
+<div class="container-fluid mt-4">
 
-<form method="post" action="@Url.Action("SendEmails")">
-    <div class="d-flex gap-2">
-        <button onclick="sendEmails()" type="button" class="btn btn-primary w-20" style="margin-right:20px">Send Email</button>
-        <a href="/Home/Index" class="btn btn-danger w-20">Back to Home</a>
+    <div class="row mb-3">
+        <div class="col">
+            <h2>Table Email Management</h2>
+        </div>
+
     </div>
-</form>
+    <table table id="searchTable" class="table table-striped table-sm table-border">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.NoBadge)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.RecipientName)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.EmailTo)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.FileName)
+                </th>
+                <th>
+                    Status
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.NoBadge)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.RecipientName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.EmailTo)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.FileName)
+                    </td>
+                    <td>
+                        @if (item.IsEncrypted)
+                        {
+                            <span class="text-success">
+                                <i class="fa-solid fa-lock"></i>
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="text-warning">
+                                <i class="fa-solid fa-lock-open"></i>
+                            </span>
+                        }
+                    </td>
 
-
-
-
-<script>
-    function sendEmails() {
-        Swal.fire({
-            title: 'Sending Emails...',
-            text: 'Please wait while emails are being sent.',
-            allowOutsideClick: false,
-            showConfirmButton: false,
-            willOpen: () => {
-                Swal.showLoading();
+                </tr>
             }
-        });
+        </tbody>
+    </table>
 
-        $.ajax({
-            url: '/Email/SendEmails',
-            type: 'POST',
-            dataType: 'json',
-            success: function (response) {
-                Swal.close(); // Tutup loading
+    <form method="post" action="@Url.Action("SendEmails")">
+        <div class="d-flex gap-2">
+            <button onclick="sendEmails()" type="button" class="btn btn-primary w-20" style="margin-right:20px">Send Email</button>
+            <a href="/Home/Index" class="btn btn-danger w-20">Back to Home</a>
+        </div>
+    </form>
 
-                if (response.success) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Success!',
-                        text: response.message || 'Emails sent successfully.',
-                        confirmButtonColor: '#3085d6',
-                        confirmButtonText: 'OK'
-                    });
-                } else {
+</div>
+
+
+    <script>
+        function sendEmails() {
+            Swal.fire({
+                title: 'Sending Emails...',
+                text: 'Please wait while emails are being sent.',
+                allowOutsideClick: false,
+                showConfirmButton: false,
+                willOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            $.ajax({
+                url: '/Email/SendEmails',
+                type: 'POST',
+                dataType: 'json',
+                success: function (response) {
+                    Swal.close(); // Tutup loading
+
+                    if (response.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success!',
+                            text: response.message || 'Emails sent successfully.',
+                            confirmButtonColor: '#3085d6',
+                            confirmButtonText: 'OK'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                               
+                                window.location.href = '/Email/Index';
+                                
+                            }
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error!',
+                            text: response.message || 'An error occurred while sending emails.',
+                            confirmButtonColor: '#d33',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                },
+                error: function (xhr) {
+                    Swal.close(); // Tutup loading
+
                     Swal.fire({
                         icon: 'error',
                         title: 'Error!',
-                        text: response.message || 'An error occurred while sending emails.',
+                        text: xhr.responseJSON?.message || 'Something went wrong while sending emails.',
                         confirmButtonColor: '#d33',
                         confirmButtonText: 'OK'
                     });
                 }
-            },
-            error: function (xhr) {
-                Swal.close(); // Tutup loading
-
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error!',
-                    text: xhr.responseJSON?.message || 'Something went wrong while sending emails.',
-                    confirmButtonColor: '#d33',
-                    confirmButtonText: 'OK'
-                });
-            }
-        });
-    }
-</script>
+            });
+        }
+    </script>
 

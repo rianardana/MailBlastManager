@@ -7,19 +7,24 @@
 
         <div class="menu-container">
             <button class="mac-button" onclick="uploadXls()">
-                <img src="https://cdn-icons-png.flaticon.com/512/732/732220.png" alt="XLS Icon">
+                <img src="~/AdminLTE/dist/img/xls-file.png" />
                 Upload Excel
             </button>
             <button class="mac-button" onclick="uploadPdf()">
-                <img src="https://cdn-icons-png.flaticon.com/512/337/337946.png" alt="PDF Icon">
+               <img src="~/AdminLTE/dist/img/pdf-file.png" />
                 Upload PDF
             </button>
+            <button class="mac-button" onclick="EncryptPdf()">
+                <img src="~/AdminLTE/dist/img/data-encryption.png" />
+                Encrypt Password
+            </button>
             <button class="mac-button" onclick="sendEmail()">
-                <img src="https://cdn-icons-png.flaticon.com/512/732/732200.png" alt="Email Icon">
+                <img src="~/AdminLTE/dist/img/email-blast.png" />
                 Send Blast Email
             </button>
             <button class="mac-button" onclick="Report()">
-                <img src="https://cdn-icons-png.flaticon.com/512/2921/2921226.png" alt="Report Icon">  Report
+              <img src="~/AdminLTE/dist/img/documentation.png" />
+                Report
             </button>
         </div>
 
@@ -100,5 +105,8 @@
 
     function Report() {
         window.location.href = "/Email/Report";
+    }
+    function EncryptPdf() {
+        window.location.href = "/Email/AllReadyDoc";
     }
 </script>

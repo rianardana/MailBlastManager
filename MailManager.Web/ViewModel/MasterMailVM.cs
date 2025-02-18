@@ -10,6 +10,8 @@ namespace MailManager.Web.ViewModel
     {
         public int Id { get; set; }
         [Display(Name ="No Badge")]
+        public string NoBadge { get; set; }
+        [Display(Name = "File Name")]
         public string FileName { get; set; }
         [Display(Name = "Employee Name")]
         public string RecipientName { get; set; }

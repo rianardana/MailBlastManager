@@ -15,14 +15,15 @@ namespace MailManager.Data
     public partial class MasterMail
     {
         public int Id { get; set; }
-        public string FileName { get; set; }
+        public string NoBadge { get; set; }
         public string RecipientName { get; set; }
+        public System.DateTime DateofBirth { get; set; }
         public string EmailTo { get; set; }
+        public string FileName { get; set; }
         public string Subject { get; set; }
-        public string Body { get; set; }
-        public Nullable<bool> IsSent { get; set; }
+        public bool IsSent { get; set; }
         public Nullable<System.DateTime> SentOnUTC { get; set; }
         public bool IsEncrypted { get; set; }
-        public System.DateTime DateofBirth { get; set; }
+        public string Body { get; set; }
     }
 }
